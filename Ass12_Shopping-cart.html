@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" type="text/css">
+    <link rel="stylesheet" href="category.css">
+</head>
+
+<body>
+    <div class="app_container">
+        <div id="app">
+            <nav class="navbar navbar-expand-lg navbar-light bg-primary">
+
+                <div class="container">
+                    <button class="navbar-toggler navbar-toggler-right border-0 p-0" type="button" data-toggle="collapse" data-target="#navbar20" style="">
+                        <p class="navbar-brand text-white mb-0"><i class="fa d-inline fa-lg fa-stop-circle"></i> BRAND </p>
+                    </button>
+                        <a class="navbar-brand text-primary"><img src="https://cdn-icons.flaticon.com/png/512/3769/premium/3769084.png?token=exp=1637657773~hmac=c2266a7cf9650271e9cde2b0b34a6871" style="height: 40px;" class="rounded">
+                        </a>
+                        <p class="d-none d-md-block lead mb-0 text-light bg-danger"> <strong>BUBBLE BEAR</strong></p>
+                        
+                        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                            <li class="nav-item" v-on:click="ShowHomePage">
+                                <a class="nav-link active text-white" aria-current="page" href="#" >Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" href="#">Promotions</a>
+                            </li>
+                            <li class="nav-item" v-on:click="ShowMyBag">
+                                <a class="nav-link text-white" href="#">My Shopping Bag ({{countitem}})</a>
+                            </li>
+                        </ul>
+                        
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Start page-->
+            <div class="container" style="margin-top : 30px;" v-if="product_page">
+                <h3>Products ::</h3>
+                <hr/>
+                <div class="home container">
+                    <div class="col-md-12 p-2">
+                        <div class="row">
+                            <div class="row equal row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-4">
+                                <Product v-on:add-item="addItem" v-for="product in products" :product="product" :key="product.id" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- CART page-->
+            <div class="container" style="margin-top : 30px;" v-if="bag_page">
+                <h3>My Shopping Bag ::</h3>
+                <hr/>
+                <div class="home container">
+                    <div class="row">
+                        <div class="col-md-12 pt-5">
+                            <BagItem v-for="item in bag" :item="item" :key="item.id" />
+                            <Product v-on:remove-item="removeItem" v-for="product in products" :product="product" :key="product.id" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    </div>
+
+    <template id="product-template">
+        <div class="col mb-4 d-flex">
+            <div class="card">
+                <img :src="product.url" class="card-img-top" alt="...">
+                <div class="card-body">
+                <h5 class="card-title">{{product.name}}</h5>
+                <p class="card-text">
+                    ${{product.price}}
+                    <br/>
+                    <small>
+                    {{product.shortdesc}}
+                    </small>
+                </p>
+                <button @click="addToBag()" class="btn btn-primary btn-block">Add to bag</button>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <template id="bagitem-template">
+        <div>{{item.name}} - {{item.count}}</div>
+            <button @click="removeFromBag()" class="btn btn-primary btn-block">Remove from bag</button>
+    </template>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+    <script src="https://unpkg.com/vue@next"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    
+    <script>
+        let app = Vue.createApp({
+
+            data: function() {
+                return {
+                    
+                    product_page: true,
+                    bag_page: false,
+
+                    products: [{
+                        id: 1,
+                        name: "BUBBLE FAMILY",
+                        price: 599,
+                        shortdesc: "No bear, No elephant, just animal!",
+                        url: "https://image.freepik.com/free-photo/bad-teddy-bear-toys_53876-144953.jpg"
+                    }, {
+                        id: 2,
+                        name: "BFF BUBBLEBEAR",
+                        price: 479,
+                        shortdesc: "they are best friend, take them in pair",
+                        url: "https://image.freepik.com/free-photo/two-teddy-bears-raft-floating_1357-23.jpg"
+                    }, {
+                        id: 3,
+                        name: "COUPLE BUBBLEBEAR",
+                        price: 459,
+                        shortdesc: "Similar to BFf but yet, we are couple!",
+                        url: "https://image.freepik.com/free-photo/two-teddy-bears-wood-background_1357-275.jpg"
+                    }, {
+                        id: 4,
+                        name: "BUBBLEBEAR SAY HI!",
+                        price: 799,
+                        shortdesc: "Huge but cute, Im not fat Im hairy!",
+                        url: "https://image.freepik.com/free-photo/teddy-bear_144627-15240.jpg"
+                    }, {
+                        id: 5,
+                        name: "SICK BUBBLEBEAR",
+                        price: 699,
+                        shortdesc: "COVID-19  Situation get worse!",
+                        url: "https://image.freepik.com/free-photo/selective-focus-shot-white-stuffed-teddy-bear-with-mask_181624-32530.jpg"
+                    }, {
+                        id: 6,
+                        name: "I CRUSHING ON YOU",
+                        price: 999,
+                        shortdesc: "On sale!! This price in pair",
+                        url: "https://image.freepik.com/free-photo/two-teddy-bears-garden-background_1357-174.jpg"
+                    }],
+
+                    bag: []
+                }
+            },
+
+            mounted: function() {
+
+            },
+
+            methods: {
+                addItem: function(id) {
+                    console.log(this.products)
+                    console.log(id)
+                    
+                    //Check if this product already in the cart
+                    item = this.bag.find(product => product.id == id)
+
+                    if (item) { // if this product already in the cart
+                        item.count += 1
+                    } else {
+                        item = this.products.find(product => product.id == id)
+                        this.bag.push({
+                            id: item.id,
+                            name: item.name,
+                            count: 1
+                        })
+                    }
+                    console.log(this.bag)
+                },
+
+                removeItem:function(id) {
+                    console.log(this.products)
+                    console.log(id)
+                    
+                    item = this.bag.find(product => product.id == id)
+
+                    if (item) {
+                        item = this.products.find(product => product.id == id)
+                        this.bag.push({
+                            id: item.id,
+                            name: item.name,
+                            count: -1
+                        })
+                    }   
+                    console.log(this.bag)
+                },
+
+                ShowMyBag: function() {
+                    this.bag_page = true
+                    this.product_page = false
+                },
+
+                ShowHomePage: function() {
+                    this.product_page = true
+                    this.bag_page = false
+                }
+            },
+
+            computed: {
+                countitem: function() {
+                    var total = 0
+                    for (i in this.bag) {
+                        total += this.bag[i].count
+                    }
+                    return total
+                }
+            }
+
+        })
+
+        app.component('Product', {
+            data: function() {
+                return {}
+            },
+            props: ['product'],
+            template: "#product-template",
+
+            methods: {
+                addToBag: function() {
+                    this.$emit("add-item", this.product.id)
+                },
+                removeFromBag: function() {
+                    this.$emit("remove-item", this.product.id)
+                }
+
+            },
+        });
+
+        app.component('Bagitem', {
+            props: ['item'],
+            template: '#bagitem-template',
+        });
+
+        app.mount("#app")
+    </script>
+
+
+</body>
+
+</html>
